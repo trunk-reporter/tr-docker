@@ -4,6 +4,7 @@
 # Plugins included:
 #   mqtt_status     (TrunkRecorder/tr-plugin-mqtt)   — call/unit/recorder events
 #   mqtt_dvcf       (trunk-reporter/tr-plugin-dvcf)  — DVCF writer + MQTT publisher
+#   mqtt_avcf       (trunk-reporter/tr-plugin-avcf)  — AVCF writer + MQTT publisher
 #   symbolstream    (trunk-reporter/symbolstream)     — live codec frame streaming
 #   simplestream    (upstream, patched)               — audio streaming
 #   openmhz_uploader  (upstream)                      — OpenMHz upload
@@ -35,7 +36,7 @@ RUN apt-get update && apt-get -y upgrade && \
     rm -rf /var/lib/apt/lists/*
 
 # ---------------------------------------------------------------------------
-# Paho MQTT (required by mqtt_status + mqtt_dvcf)
+# Paho MQTT (required by mqtt_status + mqtt_dvcf + mqtt_avcf)
 # ---------------------------------------------------------------------------
 WORKDIR /deps
 
@@ -71,6 +72,9 @@ RUN git clone --depth 1 https://github.com/TrunkRecorder/tr-plugin-mqtt user_plu
 
 # DVCF writer + MQTT publisher (IMBE-ASR integration)
 RUN git clone --depth 1 https://github.com/trunk-reporter/tr-plugin-dvcf user_plugins/mqtt_dvcf
+
+# AVCF writer + MQTT publisher (analog call capture)
+RUN git clone --depth 1 https://github.com/trunk-reporter/tr-plugin-avcf user_plugins/mqtt_avcf
 
 # Live codec frame streaming
 RUN git clone --depth 1 https://github.com/trunk-reporter/symbolstream user_plugins/symbolstream
@@ -114,6 +118,6 @@ WORKDIR /app
 ENV HOME=/tmp
 
 LABEL org.opencontainers.image.source="https://github.com/trunk-reporter/tr-docker"
-LABEL org.opencontainers.image.description="Trunk Recorder with mqtt_status, mqtt_dvcf, symbolstream, simplestream, openmhz, broadcastify, unit_script"
+LABEL org.opencontainers.image.description="Trunk Recorder with mqtt_status, mqtt_dvcf, mqtt_avcf, symbolstream, simplestream, openmhz, broadcastify, unit_script"
 
 CMD ["trunk-recorder", "--config=/app/config.json"]
