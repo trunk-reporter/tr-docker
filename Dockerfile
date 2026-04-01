@@ -98,7 +98,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get -y upgrade && \
     apt-get install --no-install-recommends -y \
-        ca-certificates curl wget sox fdkaac \
+        ca-certificates curl wget sox fdkaac ffmpeg \
         gr-funcube gr-iqbal \
         libboost-log1.83.0 libboost-chrono1.83.0t64 \
         libgnuradio-digital3.10.9t64 libgnuradio-analog3.10.9t64 \
