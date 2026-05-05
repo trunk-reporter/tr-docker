@@ -1,0 +1,10 @@
+# Build
+build/
+cmake-build-*/
+*.o
+*.so
+*.a
+
+# OS
+.DS_Store
+Thumbs.db

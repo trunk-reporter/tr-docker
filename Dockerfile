@@ -22,6 +22,20 @@ FROM ubuntu:24.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Build args for git checkout refs — defaults track development branches for
+# weekly images. For reproducible production builds, pin these to specific
+# tags or commit SHAs, for example:
+#   TRUNK_RECORDER_REF=v8.6.0
+#   TR_PLUGIN_MQTT_REF=v1.0.0
+#   TR_PLUGIN_DVCF_REF=abc123def
+#   TR_PLUGIN_AVCF_REF=abc123def
+#   SYMBOLSTREAM_REF=abc123def
+ARG TRUNK_RECORDER_REF=master
+ARG TR_PLUGIN_MQTT_REF=master
+ARG TR_PLUGIN_DVCF_REF=main
+ARG TR_PLUGIN_AVCF_REF=main
+ARG SYMBOLSTREAM_REF=main
+
 RUN apt-get update && apt-get -y upgrade && \
     apt-get install --no-install-recommends -y \
         build-essential ca-certificates cmake curl git \
@@ -56,7 +70,7 @@ RUN ldconfig
 # Clone upstream trunk-recorder
 # ---------------------------------------------------------------------------
 WORKDIR /src
-RUN git clone --depth 1 https://github.com/TrunkRecorder/trunk-recorder.git .
+RUN git clone --depth 1 --branch "${TRUNK_RECORDER_REF}" https://github.com/TrunkRecorder/trunk-recorder.git .
 
 # Apply pending fix: simplestream dangling pointer (PR #1107)
 COPY patches/simplestream-dangling-pointer.patch /tmp/
@@ -71,16 +85,16 @@ RUN sed -i 's|#add_subdirectory(plugins/simplestream)|add_subdirectory(plugins/s
 RUN mkdir -p user_plugins
 
 # Standard MQTT status plugin
-RUN git clone --depth 1 https://github.com/TrunkRecorder/tr-plugin-mqtt user_plugins/mqtt_status
+RUN git clone --depth 1 --branch "${TR_PLUGIN_MQTT_REF}" https://github.com/TrunkRecorder/tr-plugin-mqtt user_plugins/mqtt_status
 
 # DVCF writer + MQTT publisher (IMBE-ASR integration)
-RUN git clone --depth 1 https://github.com/trunk-reporter/tr-plugin-dvcf user_plugins/mqtt_dvcf
+RUN git clone --depth 1 --branch "${TR_PLUGIN_DVCF_REF}" https://github.com/trunk-reporter/tr-plugin-dvcf user_plugins/mqtt_dvcf
 
 # AVCF writer + MQTT publisher (analog call capture)
-RUN git clone --depth 1 https://github.com/trunk-reporter/tr-plugin-avcf user_plugins/mqtt_avcf
+RUN git clone --depth 1 --branch "${TR_PLUGIN_AVCF_REF}" https://github.com/trunk-reporter/tr-plugin-avcf user_plugins/mqtt_avcf
 
 # Live codec frame streaming
-RUN git clone --depth 1 https://github.com/trunk-reporter/symbolstream user_plugins/symbolstream
+RUN git clone --depth 1 --branch "${SYMBOLSTREAM_REF}" https://github.com/trunk-reporter/symbolstream user_plugins/symbolstream
 
 # ---------------------------------------------------------------------------
 # Build
